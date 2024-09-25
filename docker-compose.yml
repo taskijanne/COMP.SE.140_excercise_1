@@ -1,0 +1,22 @@
+services:
+  service1:
+    build:
+      context: ./service    # Path to the service directory where the Dockerfile is located
+    ports:
+      - "8199:8199"         # Maps port 8199 on the host to port 8199 on the container
+    networks:
+      - service_network     # Connects to the network defined below
+    container_name: service1
+
+  service2:
+    build:
+      context: ./service2   # Path to the service2 directory where the Dockerfile is located
+    expose:
+      - "8299"              # Exposes port 8299 internally to other services in the network
+    networks:
+      - service_network     # Connects to the same service network as service1
+    container_name: service2
+
+networks:
+  service_network:
+    driver: bridge           # Creates a custom bridge network

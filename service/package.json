@@ -11,7 +11,9 @@
   "dependencies": {
     "current-processes": "^0.2.1",
     "diskusage": "^1.2.0",
-    "nodemon": "^3.1.7",
     "ps-list": "^8.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
