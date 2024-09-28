@@ -1,0 +1,29 @@
+LLM tools were used in this assignment. The used LLM tools were:
+* ChatGPT (Version 4o)
+* Github CoPilot
+
+Main reason for the usage of LLM's were to make the work more efficient by allowing LLM's to 
+help with "boilerplate" stuff, while being able to focus on both on the big-picture 
+and learning goals myself.
+
+LLM's were able to help regarding following:
+* Helping to write boilerplate code such as HTTP server implementations
+* Helping to write Docker and Docker compose -related configuration files
+* Finding ideas of how to access information that was required in the task, such as libraries 
+that can interact with operating system (to get e.g. available disk space or system uptime)
+* Getting recommendations for how to interact between the services within the docker network
+
+Regarding using LLMs in this task, the answers from ChatGPT were quite accurate and I don't recall 
+that ChatGPT would have made too many mistakes.
+Obviously when using ChatGPT for recommending ways of implementation 
+(such as choosing a library to use) it was up to me to do the decision.
+
+Regarding the usage of CoPilot, there were couple of times where the suggestion of e.g. content of 
+single function was not what I intented to write. The CoPilot gave bit of mixed feelings, whether
+it helped or was more annoying. For example, it suggested using methods from libraries that didn't exist.
+
+My approach was to use LLM's as "helping hand", rather than trying to just copy the assignment to LLM
+and let it do the assignment for me. This got me thinking, if this type of task is something that e.g. ChatGPT could
+do from start to finish. Obviously ChatGPT couldn't have e.g. pushed the code to git (at least by itself).
+
+With the approach of using LLM's as  "helping hand", there wasn't any major things that the LLM's could not provide.

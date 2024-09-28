@@ -1,0 +1,18 @@
+What was implemented:
+* Service 1: NodeJS application, including HTTP server (running in port 8199)
+* Service 2: Python application, including HTTP server (running in port 8299)
+* When service 1 is requested with HTTP, service 1 returns information regarding it's own state and fetches information from service 2 using HTTP
+* Both services live in their own Docker containers
+* Docker compose was used to build/run both services as a "single unit" and to provide a network
+* Docker compose restricts outside connections to service 2 directly. Only way to interact with the containers from outside, is to interact with HTTP server provided by service 1
+
+Based on the task it seems that following is shared between the host and containers:
+* Storage: Both containers report same amount of available storage space
+* Uptime: Both containers report same uptime than the host system
+
+What the containers do not share:
+* Processes. Host machine runs it's own processes and containers run their own processes. Containers do not share the processes between each other.
+
+Regarding network:
+* A network (named service_network in this implementation) was created, so that the containers would be able to communicate with each other.
+* From host machines point-of-view the network is running in "localhost". From containers both of view, they each have unique IP-address and hostname
