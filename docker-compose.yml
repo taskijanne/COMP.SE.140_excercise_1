@@ -2,6 +2,9 @@ services:
   service1:
     build:
       context: ./service    # Path to the service directory where the Dockerfile is located
+    environment:
+      - NODE_ENV=production # Sets the NODE_ENV environment variable to production
+      - SERVICE2_URL=http://service2:8299 # Sets the SERVICE2_URL environment variable to the URL of service2
     ports:
       - "8199:8199"         # Maps port 8199 on the host to port 8199 on the container
     networks:

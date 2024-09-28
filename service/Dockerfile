@@ -7,8 +7,8 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json (if available) to the working directory
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --only=production
+# Install dependencies (omit dev-dependencies)
+RUN npm install --omit=dev
 
 # Copy the rest of the application source code to the container
 COPY . .

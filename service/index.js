@@ -2,9 +2,12 @@ const http = require('http');
 const os = require('os');
 const disk = require('diskusage');
 const { exec } = require('child_process');
+require('dotenv').config();
 
+const service2Url = process.env.SERVICE2_URL
+const port = 8199
 
-
+// Get ip addresses for each network adapter
 function getNetworkInterfaces() {
     const network = os.networkInterfaces();
     const networkInterfaceNames = Object.keys(network)
@@ -20,16 +23,19 @@ function getNetworkInterfaces() {
     return networkInterfaceData
 }
 
+// Get available disk space in MB
 async function getDiskInfo() {
     const diskInfo = await disk.check('/')
-    return (diskInfo.available / 1000000).toFixed(0)
+    return parseInt((diskInfo.available / (1024 * 1024)).toFixed(0))
 }
 
+// Get system uptime in seconds
 function getUptime() {
     const uptime = os.uptime()
     return uptime
 }
 
+// Get a list of running processes
 async function getRunningProcesses() {
 
     return new Promise((resolve, reject) => {
@@ -40,14 +46,14 @@ async function getRunningProcesses() {
             if (stderr) {
                 reject(stderr)
             }
-            const processes = stdout.split('\n').filter((name) => name !== '').filter((name) => name.trim())
+            const processes = stdout.split('\n').slice(1).filter((name) => name !== '').filter((name) => name.trim())
             resolve(processes)
         })
     })
 }
 
+// Gather data from service 1 (this service)
 async function getService1Data(){
-    const details = {}
     const networkInterfaces = getNetworkInterfaces()
     const processes = await getRunningProcesses()
     const diskInfo = await getDiskInfo()
@@ -63,9 +69,12 @@ async function getService1Data(){
     return data
 }
 
+// Gather data from service 2
+// Creates an HTTP request to service 2 and returns the data
 async function getService2Data(){
+    console.log(`Fetching data from service 2 at ${service2Url}`)
     return new Promise((resolve, reject) => {
-        http.get('http://service2:8299', (response) => {
+        http.get(service2Url, (response) => {
             let data = '';
             response.on('data', (chunk) => {
                 data += chunk;
@@ -80,25 +89,23 @@ async function getService2Data(){
 
 }
 
-
+// Handles HTTP requests to the service
 const requestHandler = async (request, response) => {
     if (request.url === '/') {
+        console.log('Request received');
         const service1Data = await getService1Data()
         const service2Data = await getService2Data()
         const responseBody = [{ "Service 1" : service1Data}, { "Service 2" : service2Data}]
         
-                
         response.setHeader('Content-Type', 'application/json');
-        response.end(JSON.stringify(responseBody));
+        response.end(JSON.stringify(responseBody, null, 2));
     } else {
         response.end('Invalid endpoint');
     }
 };
 
-// Create the server
 const server = http.createServer(requestHandler);
 
-// Start the server
-server.listen(8199, () => {
-    console.log('Server is listening on port 8199');
+server.listen(port, () => {
+    console.log(`Service started with HTTP server in port ${port}`);
 });
