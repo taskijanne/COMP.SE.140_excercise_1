@@ -93,6 +93,7 @@ let lastExecuted = null;
 
 // Handles HTTP requests to the service
 const requestHandler = async (request, response) => {
+    // Allow only one request every 2 seconds
     if (lastExecuted !== null && (new Date() - lastExecuted) < 2000){
         response.statusCode = 429;
         response.end('Too many requests');

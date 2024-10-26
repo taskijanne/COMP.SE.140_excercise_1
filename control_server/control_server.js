@@ -1,8 +1,10 @@
 const http = require('http');
-const { exec } = require('child_process');
 
+// The path to the Docker socket file which is mapped to the docker socket file in the host machine in docker-compose.yml
 const DOCKER_SOCKET_PATH = '/var/run/custom.sock';
 
+
+// Send a Docker command to the Docker socket
 const sendDockerCommand = async (path, method = 'POST') => {
     return new Promise((resolve, reject) => {
         const options = {
@@ -24,18 +26,16 @@ const sendDockerCommand = async (path, method = 'POST') => {
 
 
 const requestHandler = async (req, res) => {
-    console.log(`CONTROLLER: Request URL: ${req.url}, Request Method: ${req.method}`);
     
-    let thisContainerId = null;
-
+    // Endpoint used to kill all the containers within the docker compose network
     if (req.url === '/stop' && req.method === 'POST') {
-        const response = await sendDockerCommand('/v1.41/containers/json?all=true', 'GET');
+        let thisContainerId = null;
+        const response = await sendDockerCommand('/v1.41/containers/json?all=true', 'GET'); // Fetch all containers
         const containers = JSON.parse(response);
-        console.log(containers);
 
         for (const container of containers) {
             const containerId = container.Id;
-            if (container.Image !== "compse140_excercise_1-control_service"){
+            if (container.Image !== "compse140_excercise_1-control_service"){ // Skip the control service container, it will be killed last
                 console.log(`Killing container ${containerId}`);
                 await sendDockerCommand(`/v1.41/containers/${containerId}/kill`, 'POST');
             }
@@ -44,8 +44,8 @@ const requestHandler = async (req, res) => {
             }
         }
 
-        console.log(`Killing this container ${thisContainerId}`);
-        await sendDockerCommand(`/v1.41/containers/${thisContainerId}/kill`, 'POST');
+        console.log(`Killing controller service container ${thisContainerId}`);
+        await sendDockerCommand(`/v1.41/containers/${thisContainerId}/kill`, 'POST'); // Killing "this" container
 
         res.statusCode = 200;
         res.end('All containers stopped');

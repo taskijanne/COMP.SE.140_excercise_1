@@ -1,0 +1,14 @@
+CONTAINER ID   IMAGE                                   COMMAND                  CREATED          STATUS          PORTS                                               NAMES
+33bda9a8b15d   compse140_excercise_1-ngingx            "/docker-entrypoint.…"   31 seconds ago   Up 30 seconds   5000/tcp, 0.0.0.0:8081->80/tcp, [::]:8081->80/tcp   nginx
+0e3622d6e9c2   compse140_excercise_1-service1          "docker-entrypoint.s…"   32 seconds ago   Up 31 seconds   0.0.0.0:32934->8199/tcp, [::]:32934->8199/tcp       compse140_excercise_1-service1-3
+c7f081f064d6   compse140_excercise_1-control_service   "docker-entrypoint.s…"   32 seconds ago   Up 31 seconds   0.0.0.0:32935->5000/tcp, [::]:32935->5000/tcp       controller
+55b4cf545c52   compse140_excercise_1-service2          "python app.py"          32 seconds ago   Up 31 seconds   8299/tcp                                            service2
+5e04cd517ffb   compse140_excercise_1-service1          "docker-entrypoint.s…"   32 seconds ago   Up 30 seconds   0.0.0.0:32936->8199/tcp, [::]:32936->8199/tcp       compse140_excercise_1-service1-1
+a8cfea577fc0   compse140_excercise_1-service1          "docker-entrypoint.s…"   32 seconds ago   Up 30 seconds   0.0.0.0:32937->8199/tcp, [::]:32937->8199/tcp       compse140_excercise_1-service1-2
+
+NETWORK ID     NAME                                    DRIVER    SCOPE
+1fb26387880a   bridge                                  bridge    local
+b218428c6ca0   compse140_excercise_1_default           bridge    local
+4cd9ba929257   compse140_excercise_1_service_network   bridge    local
+be1747f8e265   host                                    host      local
+6dec4ce15a68   none                                    null      local
