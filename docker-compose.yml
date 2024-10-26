@@ -1,15 +1,16 @@
 services:
   service1:
     build:
-      context: ./service    # Path to the service directory where the Dockerfile is located
+      context: ./service    
     environment:
-      - NODE_ENV=production # Sets the NODE_ENV environment variable to production
-      - SERVICE2_URL=http://service2:8299 # Sets the SERVICE2_URL environment variable to the URL of service2
+      - NODE_ENV=production 
+      - SERVICE2_URL=http://service2:8299 
     ports:
-      - "8199:8199"         # Maps port 8199 on the host to port 8199 on the container
+      - "8199"
+    deploy:
+      replicas: 3         
     networks:
-      - service_network     # Connects to the network defined below
-    container_name: service1
+      - service_network     
 
   service2:
     build:
@@ -19,6 +20,27 @@ services:
     networks:
       - service_network     # Connects to the same service network as service1
     container_name: service2
+
+  ngingx:
+    build: ./nginx
+    ports:
+      - "8081:80" # Maps port 8081 on the host to port 80 on the container
+    networks:
+      - service_network
+    container_name: nginx
+    depends_on:
+      - service1
+      - service2
+
+  control_service:
+    build: ./control_server
+    ports:
+      - "5000"
+    volumes:
+      - /var/run/docker.sock:/var/run/custom.sock
+    networks:
+      - service_network
+    container_name: controller
 
 networks:
   service_network:

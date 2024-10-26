@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Landing Page</title>
+</head>
+<body>
+    <button id="button">REQUEST</button>
+    <button id="stopButton">STOP</button>
+    <pre id="message"></pre>
+    <script>
+        const messageField = document.getElementById('message');
+        document.getElementById('button').addEventListener('click', function() {
+            fetch('/api')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText);
+                    }
+                        return response.json();
+                    })
+                .then(data => messageField.textContent = JSON.stringify(data, null, 2))
+                .catch(error => messageField.textContent = error);
+        });
+        document.getElementById('stopButton').addEventListener('click', function() {
+            document.querySelector("body").innerHTML = "Server stopped";
+            fetch('/api/stop', { method: 'POST' })
+        });
+    </script>
+</body>
+</html>

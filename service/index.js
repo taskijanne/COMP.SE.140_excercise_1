@@ -89,9 +89,15 @@ async function getService2Data(){
 
 }
 
+let lastExecuted = null;
+
 // Handles HTTP requests to the service
 const requestHandler = async (request, response) => {
-    if (request.url === '/') {
+    if (lastExecuted !== null && (new Date() - lastExecuted) < 2000){
+        response.statusCode = 429;
+        response.end('Too many requests');
+    }
+    else if (request.url === '/') {
         console.log('Request received');
         const service1Data = await getService1Data()
         const service2Data = await getService2Data()
@@ -99,9 +105,11 @@ const requestHandler = async (request, response) => {
         
         response.setHeader('Content-Type', 'application/json');
         response.end(JSON.stringify(responseBody, null, 2));
+        lastExecuted = new Date();
     } else {
         response.end('Invalid endpoint');
     }
+    
 };
 
 const server = http.createServer(requestHandler);
