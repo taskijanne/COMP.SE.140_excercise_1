@@ -24,7 +24,7 @@ services:
   ngingx:
     build: ./nginx
     ports:
-      - "8081:80" # Maps port 8081 on the host to port 80 on the container
+      - "8198:80" # Maps port 8081 on the host to port 80 on the container
     networks:
       - service_network
     container_name: nginx
