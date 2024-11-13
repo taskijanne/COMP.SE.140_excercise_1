@@ -1,0 +1,9 @@
+stages:
+  - test
+
+test_job:
+  stage: test
+  script:
+    - echo "Hello, GitLab CI/CD!"
+    - uname -a
+    - docker --version   # Check Docker version to verify Docker is accessible
