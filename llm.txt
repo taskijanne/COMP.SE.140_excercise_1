@@ -1,6 +1,0 @@
-LLM's were used in this exercise.
-
-ChatGPT (version 4.0) was used for finding ideas and boilerplate code, e.g.:
-* Ideas of how to implement routing in nginx (e.g. serving static index.html file and routing the actual request towards the backend service to different path)
-* How to implement the "STOP" functionality
-* Boilerplate code for the control_server ( the service that kills all the containers when user presses stop from the browser ) 
