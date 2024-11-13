@@ -3,6 +3,7 @@ stages:
 
 test_job:
   stage: test
+  image: docker:latest
   script:
     - echo "Hello, GitLab CI/CD!"
     - uname -a
