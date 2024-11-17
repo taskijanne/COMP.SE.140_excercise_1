@@ -5,7 +5,7 @@ stages:
 # Build stage
 build:
   stage: build
-  image: docker:latest
+  #image: docker:latest
   variables:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
     DOCKER_HOST: "/var/run/docker.sock"
