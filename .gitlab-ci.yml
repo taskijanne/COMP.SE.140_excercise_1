@@ -5,6 +5,9 @@ stages:
 # Build stage
 build:
   stage: build
+  image: docker:latest
+  variables:
+    PATH: "/usr/bin:$PATH"  # Add /usr/bin to PATH
   script:
     - echo "Starting the build process"
     - docker compose build
