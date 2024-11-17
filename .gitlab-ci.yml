@@ -20,10 +20,10 @@ build:
 # Test stage
 test:
  stage: test
-  script:
+ script:
    - echo "Running tests"
    - docker compose up -d
    # - docker compose exec <service-name> npm test  # Replace with your test command
    - docker compose down
-  only:
+ only:
    - project
