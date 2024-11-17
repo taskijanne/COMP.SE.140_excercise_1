@@ -8,7 +8,7 @@ build:
   image: docker:latest
   variables:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
-    DOCKER_HOST: "unix:///var/run/docker.sock"
+    DOCKER_HOST: "/var/run/docker.sock"
   script:
     - echo "Starting the build process"
     - docker --version
