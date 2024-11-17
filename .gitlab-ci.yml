@@ -8,8 +8,8 @@ build:
   image: docker:latest
   variables:
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
- # services:
-   # - docker:dind
+  services:
+    - docker:dind
   script:
     - echo "Starting the build process"
     - docker --version
