@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
 
 build:
   stage: build
@@ -17,12 +18,12 @@ build:
     - project
 
 # Test stage
-#test:
- # stage: test
-  #script:
-  #  - echo "Running tests"
-   # - docker compose up -d
-    #- docker compose exec <service-name> npm test  # Replace with your test command
-   # - docker compose down
- # only:
-  #  - project
+test:
+ stage: test
+  script:
+   - echo "Running tests"
+   - docker compose up -d
+   # - docker compose exec <service-name> npm test  # Replace with your test command
+   - docker compose down
+  only:
+   - project
