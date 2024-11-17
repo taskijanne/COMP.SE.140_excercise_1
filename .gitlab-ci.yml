@@ -1,10 +1,23 @@
 stages:
+  - build
   - test
 
-test_job:
-  stage: test
-  image: docker:latest
+# Build stage
+build:
+  stage: build
   script:
-    - echo "Hello, GitLab CI/CD!"
-    - uname -a
-    - docker --version   # Check Docker version to verify Docker is accessible
+    - echo "Starting the build process"
+    - docker compose build
+  only:
+    - project
+
+# Test stage
+test:
+  stage: test
+  script:
+    - echo "Running tests"
+    - docker compose up -d
+    #- docker compose exec <service-name> npm test  # Replace with your test command
+    - docker compose down
+  only:
+    - project
