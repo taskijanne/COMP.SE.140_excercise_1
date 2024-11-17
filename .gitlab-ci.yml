@@ -14,7 +14,7 @@ build:
     - echo "Starting the build process"
     - docker --version
     - echo $PATH
-   # - docker compose build
+    - docker compose build
   only:
     - project
 
