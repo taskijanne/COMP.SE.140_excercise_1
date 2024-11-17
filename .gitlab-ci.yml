@@ -6,8 +6,8 @@ stages:
 build:
   stage: build
   image: docker:latest
-  variables:
-    PATH: "/usr/bin:$PATH"  # Add /usr/bin to PATH
+  #variables:
+  #  PATH: "/usr/bin:$PATH"  # Add /usr/bin to PATH
  # services:
    # - docker:dind
   script:
