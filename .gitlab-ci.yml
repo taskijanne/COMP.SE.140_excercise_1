@@ -8,12 +8,13 @@ build:
   image: docker:latest
   variables:
     PATH: "/usr/bin:$PATH"  # Add /usr/bin to PATH
-  services:
-    - docker:dind
+ # services:
+   # - docker:dind
   script:
     - echo "Starting the build process"
     - docker --version
-    - docker compose build
+    - echo $PATH
+   # - docker compose build
   only:
     - project
 
