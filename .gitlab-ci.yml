@@ -7,7 +7,7 @@ build:
   stage: build
   image: docker:latest
   variables:
-    PATH: "/usr/bin:$PATH"  # Add /usr/bin to PATH
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
  # services:
    # - docker:dind
   script:
