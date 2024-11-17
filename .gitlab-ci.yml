@@ -19,17 +19,17 @@ build:
 
 # Test stage
 test:
- stage: test
+  stage: test
   variables:
     DOCKER_TLS_CERTDIR: ""  # Disable TLS for Docker-in-Docker
     DOCKER_HOST: "tcp://docker:2375"  # Connect to the Docker daemon provided by docker:dind
   services:
     - docker:dind
- script:
-   - echo "Running tests"
-   - docker compose up -d
-   - sleep 10
+  script:
+    - echo "Running tests"
+    - docker compose up -d
+    - sleep 10
    # - docker compose exec <service-name> npm test  # Replace with your test command
-   - docker compose down
- only:
-   - project
+    - docker compose down
+  only:
+    - project
