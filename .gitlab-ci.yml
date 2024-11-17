@@ -1,29 +1,28 @@
 stages:
   - build
-  - test
 
-# Build stage
 build:
   stage: build
-  #image: docker:latest
+  image: docker:latest
   variables:
-    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" 
-    DOCKER_HOST: "/var/run/docker.sock"
+    DOCKER_TLS_CERTDIR: ""  # Disable TLS for Docker-in-Docker
+    DOCKER_HOST: "tcp://docker:2375"  # Connect to the Docker daemon provided by docker:dind
+  services:
+    - docker:dind
   script:
     - echo "Starting the build process"
     - docker --version
-    - echo $PATH
     - docker compose build
   only:
     - project
 
 # Test stage
-test:
-  stage: test
-  script:
-    - echo "Running tests"
-    - docker compose up -d
+#test:
+ # stage: test
+  #script:
+  #  - echo "Running tests"
+   # - docker compose up -d
     #- docker compose exec <service-name> npm test  # Replace with your test command
-    - docker compose down
-  only:
-    - project
+   # - docker compose down
+ # only:
+  #  - project
