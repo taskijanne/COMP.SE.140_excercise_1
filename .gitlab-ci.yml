@@ -28,7 +28,9 @@ test:
   script:
     - echo "Running tests"
     - docker compose up -d
-    - sleep 10
+    - sleep 5
+    - docker build -t test-project ./tests
+    - docker run --rm --network host test-project
    # - docker compose exec <service-name> npm test  # Replace with your test command
     - docker compose down
   only:
