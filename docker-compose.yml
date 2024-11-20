@@ -21,6 +21,15 @@ services:
       - service_network     
     container_name: service2
 
+  api_gateway:
+    build:
+      context: ./api_gateway
+    ports:
+      - "8197:80"
+    networks:
+      - service_network
+    container_name: api_gateway
+
   ngingx:
     build: ./nginx
     ports:
@@ -31,6 +40,7 @@ services:
     depends_on:
       - service1
       - service2
+      - api_gateway
 
   control_service: # A control service which has a purpose of controlling the other services. In this case, killing them when user presses "STOP" button from frontend.
     build: ./control_server

@@ -13,7 +13,7 @@
     <script>
         const messageField = document.getElementById('message');
         document.getElementById('button').addEventListener('click', function() {
-            fetch('/api')
+            fetch('/api/request')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(response.statusText);
