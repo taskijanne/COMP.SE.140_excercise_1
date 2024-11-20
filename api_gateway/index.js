@@ -14,6 +14,7 @@ let state = "INIT"; // Default state
 app.put("/state", (req, res) => {
     const validStates = ["INIT", "PAUSED", "RUNNING", "SHUTDOWN"];
     const newState = req.body;
+    console.log(`${req.body}`);
 
     if (!validStates.includes(newState)) {
         res.status(400).send("Invalid state. Use INIT, PAUSED, RUNNING, or SHUTDOWN.");
@@ -31,6 +32,7 @@ app.get("/state", (req, res) => {
 
 // GET /request
 app.get("/request", (req, res) => {
+    console.log(req.headers)
     res.status(200).send("Request endpoint hit.");
 });
 

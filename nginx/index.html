@@ -18,9 +18,9 @@
                     if (!response.ok) {
                         throw new Error(response.statusText);
                     }
-                        return response.json();
+                        return response.text();
                     })
-                .then(data => messageField.textContent = JSON.stringify(data, null, 2))
+                .then(data => messageField.textContent = data)
                 .catch(error => messageField.textContent = error);
         });
         document.getElementById('stopButton').addEventListener('click', function() {
