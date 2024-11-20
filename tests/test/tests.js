@@ -38,6 +38,7 @@ describe('Running tests ', async () => {
   it('should not allow changing state from INIT => PAUSED', (done) => {
     chai.request.execute(server)
       .put('/state')
+      .set('Content-Type', 'text/plain')
       .send('PAUSED')
       .end((err, res) => {
         expect(res).to.have.status(400);
@@ -49,6 +50,7 @@ describe('Running tests ', async () => {
   it ('should allow changing state from INIT => RUNNING', (done) => {
     chai.request.execute(server)
       .put('/state')
+      .set('Content-Type', 'text/plain')
       .send('RUNNING')
       .end((err, res) => {
         expect(res).to.have.status(200);
@@ -90,6 +92,7 @@ describe('Running tests ', async () => {
   it('should allow changing state from RUNNING => PAUSED', (done) => {
     chai.request.execute(server)
       .put('/state')
+      .set('Content-Type', 'text/plain')
       .send('PAUSED')
       .end((err, res) => {
         expect(res).to.have.status(200);
@@ -122,6 +125,7 @@ describe('Running tests ', async () => {
   it('should allow changing state from PAUSED => RUNNING', (done) => {
     chai.request.execute(server)
       .put('/state')
+      .set('Content-Type', 'text/plain')
       .send('RUNNING')
       .end((err, res) => {
         expect(res).to.have.status(200);
@@ -134,6 +138,7 @@ describe('Running tests ', async () => {
   it('should allow changing state from RUNNING => SHUTDOWN', (done) => {
     chai.request.execute(server)
       .put('/state')
+      .set('Content-Type', 'text/plain')
       .send('SHUTDOWN')
       .end((err, res) => {
         expect(res).to.have.status(200);
