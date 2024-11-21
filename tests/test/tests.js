@@ -10,7 +10,7 @@ describe('Running tests ', async () => {
       .end((err, res) => {
         expect(res).to.have.status(200);
         expect(res.headers['content-type']).to.equal('text/plain; charset=utf-8');
-        expect(res.text).to.equal('INIT');
+        expect(res.text).to.include('INIT');
         done();
       });
   });

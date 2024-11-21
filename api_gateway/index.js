@@ -1,8 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const Logger = require("./logger.js");
 
 const app = express();
-const port = 80; // Port for the API Gateway
+const port = 80; 
+
+const logger = new Logger();
 
 // Middleware to parse text/plain bodies
 app.use(bodyParser.text({ type: "text/plain" }));
@@ -22,7 +25,6 @@ const State = {
     SHUTDOWN: "SHUTDOWN",
 
 };
-
 
 const validStateTransitions = [
     [State.INIT, State.RUNNING],
@@ -51,13 +53,15 @@ app.put("/state", (req, res) => {
         return;
     }
 
+    logger.log(`${state} -> ${newState}`);
     state = newState; // Update the state
+    
     res.status(200).send(`${state}`);
 });
 
 // GET /state
 app.get("/state", (req, res) => {
-    res.status(200).send(state);
+    res.status(200).send(`${state}\n`);
 });
 
 // GET /request
@@ -68,7 +72,8 @@ app.get("/request", (req, res) => {
 
 // GET /run-log
 app.get("/run-log", (req, res) => {
-    res.status(200).send("Run log retrieved.");
+    const logs = logger.getLogs().join("\n");
+    res.status(200).send(`${logs}\n`);
 });
 
 // Catch-all for undefined routes
