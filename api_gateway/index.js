@@ -5,6 +5,8 @@ const http = require('http');
 require('dotenv').config();
 
 const SERVICE1_URL = process.env.SERVICE1_URL // Defined in docker-compose.yml
+const CONTROLLER_URL = process.env.CONTROLLER_URL // Defined in docker-compose.yml
+
 const app = express();
 const port = 80; 
 
@@ -45,12 +47,23 @@ async function getService1Data(){
     return new Promise((resolve, reject) => {
         http.get(SERVICE1_URL, (response) => {
             let data = '';
+            const statusCode = response.statusCode;
+
             response.on('data', (chunk) => {
                 data += chunk;
             });
             response.on('end', () => {
-                resolve(JSON.parse(data)); 
+                if (statusCode !== 200) {
+                    reject({
+                        statusCode: statusCode,
+                        message: data
+                    });
+                }
+                else {
+                    resolve(JSON.parse(data));
+                }
             });
+
         }).on("error", (err) => {
             resolve("Error fetching data from service 1")
         });
@@ -74,6 +87,11 @@ app.put("/state", (req, res) => {
 
     logger.log(`${state} -> ${newState}`);
     state = newState; // Update the state
+
+    if (state === State.SHUTDOWN) {
+        // Call control server to stop all containers
+        http.request(`${CONTROLLER_URL}/stop`, { method: 'POST' }).end();
+    }
     
     res.status(200).send(`${state}\n`);
 });
@@ -91,9 +109,15 @@ app.get("/request", async (req, res) => {
     }
 
     // Call service 1
-    const data = await getService1Data();
-    console.log(data)
-    res.status(200).send(`${JSON.stringify(data, null, 2)}\n`);
+    try {
+        const data = await getService1Data();
+        res.status(200).send(`${JSON.stringify(data, null, 2)}\n`);
+    }
+    catch (err) {
+        res.status(err.statusCode || 500).send(`${err.message || 'Internal Server Error'}\n`);
+
+    }
+
 });
 
 // GET /run-log

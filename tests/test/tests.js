@@ -148,15 +148,18 @@ describe('Running tests ', async () => {
       });
   }); 
 
-  it('shoult return error since containers are down', async () => {
-
-    await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds since shutdown might take some time
-
+  it('should return error since containers are down', async function () {
+    this.timeout(6000); // Increase the timeout to 6 seconds to prevent mochas timeout to kick in before http timeout
+  
+    // Wait for 3 seconds to allow shutdown
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  
     try {
-      await chai.request.execute(server).get('/request')
-    }
-    catch (err) { 
-      expect(err).to.be.not.null;
+      const res = await chai.request.execute(server).get('/request');
+      throw new Error(`Server is still alive: received status ${res.status}`);
+
+    } catch (err) {
+      expect(err.code).to.equal("ECONNREFUSED"); // Server is down
     }
   });
 
