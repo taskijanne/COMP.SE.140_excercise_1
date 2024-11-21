@@ -2,6 +2,8 @@ const http = require('http');
 
 // The path to the Docker socket file which is mapped to the docker socket file in the host machine in docker-compose.yml
 const DOCKER_SOCKET_PATH = '/var/run/custom.sock';
+const CONTROLLER_CONTAINER = 'compse140_excercise_1-control_service';
+const TEST_CONTAINER = "compse140_excercise_1-test_service"
 
 
 // Send a Docker command to the Docker socket
@@ -35,11 +37,12 @@ const requestHandler = async (req, res) => {
 
         for (const container of containers) {
             const containerId = container.Id;
-            if (container.Image !== "compse140_excercise_1-control_service"){ // Skip the control service container, it will be killed last
+            console.log(container.Image);
+            if (container.Image !== CONTROLLER_CONTAINER && container.Image !== TEST_CONTAINER){ // Skip the control service container, it will be killed last
                 console.log(`Killing container ${containerId}`);
                 await sendDockerCommand(`/v1.41/containers/${containerId}/kill`, 'POST');
             }
-            else {
+            else if (container.Image === CONTROLLER_CONTAINER){
                 thisContainerId = containerId;
             }
         }
