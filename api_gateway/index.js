@@ -1,7 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const Logger = require("./logger.js");
+const http = require('http');
+require('dotenv').config();
 
+const SERVICE1_URL = process.env.SERVICE1_URL // Defined in docker-compose.yml
 const app = express();
 const port = 80; 
 
@@ -38,6 +41,22 @@ const isValidStateTransition = (fromState, toState) => {
     return validStateTransitions.some(([from, to]) => from === fromState && to === toState);
 }
 
+async function getService1Data(){
+    return new Promise((resolve, reject) => {
+        http.get(SERVICE1_URL, (response) => {
+            let data = '';
+            response.on('data', (chunk) => {
+                data += chunk;
+            });
+            response.on('end', () => {
+                resolve(JSON.parse(data)); 
+            });
+        }).on("error", (err) => {
+            resolve("Error fetching data from service 1")
+        });
+    })
+}
+
 // PUT /state
 app.put("/state", (req, res) => {
     console.log(req.body)
@@ -56,7 +75,7 @@ app.put("/state", (req, res) => {
     logger.log(`${state} -> ${newState}`);
     state = newState; // Update the state
     
-    res.status(200).send(`${state}`);
+    res.status(200).send(`${state}\n`);
 });
 
 // GET /state
@@ -65,13 +84,26 @@ app.get("/state", (req, res) => {
 });
 
 // GET /request
-app.get("/request", (req, res) => {
-    console.log(req.headers)
-    res.status(200).send("Request endpoint hit.");
+app.get("/request", async (req, res) => {
+    if (state === State.PAUSED || state === State.INIT)     {
+        res.status(400).send("Invalid state for processing /request .\n");
+        return;
+    }
+
+    // Call service 1
+    const data = await getService1Data();
+    console.log(data)
+    res.status(200).send(`${JSON.stringify(data, null, 2)}\n`);
 });
 
 // GET /run-log
 app.get("/run-log", (req, res) => {
+
+    if (state === State.PAUSED || state === State.INIT) {
+        res.status(400).send("Invalid state for processing /run-log .\n");
+        return;
+    }
+
     const logs = logger.getLogs().join("\n");
     res.status(200).send(`${logs}\n`);
 });

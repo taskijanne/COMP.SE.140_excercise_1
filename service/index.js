@@ -4,7 +4,7 @@ const disk = require('diskusage');
 const { exec } = require('child_process');
 require('dotenv').config();
 
-const service2Url = process.env.SERVICE2_URL
+const service2Url = process.env.SERVICE2_URL // Defined in docker-compose.yml
 const port = 8199
 
 // Get ip addresses for each network adapter

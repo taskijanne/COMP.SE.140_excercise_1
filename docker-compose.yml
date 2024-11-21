@@ -24,6 +24,9 @@ services:
   api_gateway:
     build:
       context: ./api_gateway
+    environment:
+      - NODE_ENV=production 
+      - SERVICE1_URL=http://service1:8199 
     ports:
       - "8197:80"
     networks:
