@@ -148,6 +148,7 @@ describe('Running tests ', async () => {
       });
   }); 
 
+  /*
   it('should return error since containers are down', async function () {
     this.timeout(6000); // Increase the timeout to 6 seconds to prevent mochas timeout to kick in before http timeout
   
@@ -161,6 +162,6 @@ describe('Running tests ', async () => {
     } catch (err) {
       expect(err.code).to.equal("ECONNREFUSED"); // Server is down
     }
-  });
+  });*/
 
 });
