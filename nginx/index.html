@@ -10,6 +10,7 @@
     <button id="startButton">START</button>
     <button id="pauseButton">PAUSE</button>
     <button id="requestButton">REQUEST</button>
+    <button id="logsButton">GET LOGS</button>
     <button id="stopButton">STOP</button>
     <pre id="message"></pre>
     <script>
@@ -45,9 +46,16 @@
                 .then(data => messageField.textContent = data)
                 .catch(error => messageField.textContent = error);
         });
+
+        document.getElementById('logsButton').addEventListener('click', function() {
+            sendHTTPRequest('/api/run-log')
+                .then(data => messageField.textContent = data)
+                .catch(error => messageField.textContent = error);
+        });
+
         document.getElementById('stopButton').addEventListener('click', function() {
             sendHTTPRequest('/api/state', 'PUT', 'SHUTDOWN')
-                .then(document.body.innerHTML = "Shutdown initiated succesfully. Please exit the page.")
+                .then(data => document.body.innerHTML = "Shutdown initiated succesfully. The site will go down.")
                 .catch(error => messageField.textContent = error);
         });
     </script>

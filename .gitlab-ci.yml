@@ -8,12 +8,15 @@ build:
   variables:
     DOCKER_TLS_CERTDIR: ""  # Disable TLS for Docker-in-Docker
     DOCKER_HOST: "tcp://docker:2375"  # Connect to the Docker daemon provided by docker:dind
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   services:
     - docker:dind
   script:
     - echo "Starting the build process"
     - docker --version
+    - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - docker compose build
+    - docker compose push   
   only:
     - project
 
