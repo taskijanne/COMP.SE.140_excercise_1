@@ -3,6 +3,8 @@ import chaiHttp from 'chai-http'
 const chai = use(chaiHttp)
 const server = 'http://localhost:8197'; // Replace with your server URL
 
+const authString = 'Basic ' + Buffer.from('admin:admin').toString('base64');
+
 describe('Running tests ', async () => {
   it('/state should return INIT when tests are started', (done) => {
     chai.request.execute(server)
@@ -47,10 +49,23 @@ describe('Running tests ', async () => {
       });
   });
 
-  it ('should allow changing state from INIT => RUNNING', (done) => {
+  it('should return 401 when trying to set state from INIT => RUNNING while not authorized', (done) => {
     chai.request.execute(server)
       .put('/state')
       .set('Content-Type', 'text/plain')
+      .send('RUNNING')
+      .end((err, res) => {
+        expect(res).to.have.status(401);
+        expect(res.headers['content-type']).to.equal('text/plain; charset=utf-8');
+        done();
+      });
+  });
+
+  it ('should allow changing state from INIT => RUNNING while authorized', (done) => {
+    chai.request.execute(server)
+      .put('/state')
+      .set('Content-Type', 'text/plain')
+      .set('Authorization', authString)
       .send('RUNNING')
       .end((err, res) => {
         expect(res).to.have.status(200);
@@ -147,21 +162,5 @@ describe('Running tests ', async () => {
         done();
       });
   }); 
-
-  /*
-  it('should return error since containers are down', async function () {
-    this.timeout(6000); // Increase the timeout to 6 seconds to prevent mochas timeout to kick in before http timeout
-  
-    // Wait for 3 seconds to allow shutdown
-    await new Promise(resolve => setTimeout(resolve, 3000));
-  
-    try {
-      const res = await chai.request.execute(server).get('/request');
-      throw new Error(`Server is still alive: received status ${res.status}`);
-
-    } catch (err) {
-      expect(err.code).to.equal("ECONNREFUSED"); // Server is down
-    }
-  });*/
 
 });
