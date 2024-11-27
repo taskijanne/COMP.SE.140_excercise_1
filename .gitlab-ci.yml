@@ -52,8 +52,13 @@ deploy:
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY_B64" | base64 -d > ~/.ssh/key.pem
+    - chmod 700 ~/.ssh
+    - chmod 600 ~/.ssh/key.pem
+    - ssh-keyscan -H 128.214.254.140 >> ~/.ssh/known_hosts
   script:
     - echo "Transferring docker-compose.yml to the VM"
-    - scp -i ~/.ssh/janneskey.pem docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
+    - scp -i ~/.ssh/id_rsa docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
   only:
     - project
