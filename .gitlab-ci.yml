@@ -2,6 +2,13 @@ stages:
   - build
   - test
 
+variables:
+  NGINX_IMAGE: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_SHORT_SHA
+  CONTROL_SERVICE_IMAGE: $CI_REGISTRY_IMAGE/control_service:$CI_COMMIT_SHORT_SHA
+  SERVICE1_IMAGE: $CI_REGISTRY_IMAGE/service1:$CI_COMMIT_SHORT_SHA
+  SERVICE2_IMAGE: $CI_REGISTRY_IMAGE/service2:$CI_COMMIT_SHORT_SHA
+  API_GATEWAY_IMAGE: $CI_REGISTRY_IMAGE/api_gateway:$CI_COMMIT_SHORT_SHA
+
 build:
   stage: build
   image: docker:latest
