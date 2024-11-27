@@ -59,6 +59,6 @@ deploy:
     - ssh-keyscan -H 128.214.254.140 >> ~/.ssh/known_hosts
   script:
     - echo "Transferring docker-compose.yml to the VM"
-    - scp -i ~/.ssh/id_rsa docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
+    - scp -i ~/.ssh/key.pem docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
   only:
     - project
