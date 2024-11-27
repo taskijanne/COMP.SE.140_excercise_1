@@ -1,0 +1,70 @@
+services:
+  service1:
+    build:
+      context: ./service    
+    image: ${SERVICE1_IMAGE:-service1:latest}
+    environment:
+      - NODE_ENV=production 
+      - SERVICE2_URL=http://service2:8299 
+    ports:
+      - "8199"            # Exposes port 8299 internally to other services in the network, but not oustide the network
+    deploy:
+      replicas: 3         # Creates 3 replicas of the service1 container
+    networks:
+      - service_network     
+
+  service2:
+    build:
+      context: ./service2   
+    image: ${SERVICE2_IMAGE:-service2:latest}
+    expose:
+      - "8299"              # Exposes port 8299 internally to other services in the network, but not oustide the network
+    networks:
+      - service_network     
+    container_name: service2
+
+  api_gateway:
+    build:
+      context: ./api_gateway
+    image: ${API_GATEWAY_IMAGE:-api_gateway:latest}
+    environment:
+      - NODE_ENV=production 
+      - SERVICE1_URL=http://service1:8199 
+      - CONTROLLER_URL=http://controller:5000
+      - NGINX_URL=http://nginx
+    ports:
+      - "8197:80"
+    networks:
+      - service_network
+    container_name: api_gateway
+
+  ngingx:
+    build: ./nginx
+    image: ${NGINX_IMAGE:-nginx:latest}
+    ports:
+      - "8198:80" # Maps port 8081 on the host to port 80 on the container
+    networks:
+      - service_network
+    container_name: nginx
+    depends_on:
+      - service1
+      - service2
+      - api_gateway
+
+  control_service: # A control service which has a purpose of controlling the other services. In this case, killing them when user presses "STOP" button from frontend.
+    build: ./control_server
+    image: ${CONTROL_SERVICE_IMAGE:-control_service:latest}
+    ports:
+      - "5000"
+    volumes:
+    # Mounts the Docker socket to the container.
+    # This allows the container to interact with the Docker daemon (e.g. to send kill -commands)
+      - /var/run/docker.sock:/var/run/custom.sock  
+      
+    networks:
+      - service_network
+    container_name: controller
+
+networks:
+  service_network:
+    driver: bridge           # Creates a custom bridge network

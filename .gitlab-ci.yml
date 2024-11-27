@@ -54,6 +54,6 @@ deploy:
     - apk add --no-cache openssh-client
   script:
     - echo "Transferring docker-compose.yml to the VM"
-    - scp docker-compose.yml ubuntu@$VM_ADDRESS:/home/ubuntu
+    - scp -i ~/.ssh/janneskey.pem docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
   only:
     - project
