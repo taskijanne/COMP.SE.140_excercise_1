@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const SERVICE1_URL = process.env.SERVICE1_URL // Defined in docker-compose.yml
 const CONTROLLER_URL = process.env.CONTROLLER_URL // Defined in docker-compose.yml
+const NGINX_URL = process.env.NGINX_URL // Defined in docker-compose.yml
 
 const app = express();
 const port = 80; 
@@ -37,10 +38,20 @@ const validStateTransitions = [
     [State.RUNNING, State.SHUTDOWN],
     [State.PAUSED, State.RUNNING],
     [State.PAUSED, State.SHUTDOWN],
+    [State.RUNNING, State.INIT],
+    [State.PAUSED, State.INIT],
+]
+
+const requiresAuthTransitions = [
+    [State.INIT, State.RUNNING],
 ]
 
 const isValidStateTransition = (fromState, toState) => {
     return validStateTransitions.some(([from, to]) => from === fromState && to === toState);
+}
+
+const requiresAuth = (fromState, toState) => {
+    return requiresAuthTransitions.some(([from, to]) => from === fromState && to === toState);
 }
 
 async function getService1Data(){
@@ -70,9 +81,37 @@ async function getService1Data(){
     })
 }
 
+async function authorization(baseAuthString){
+    return new Promise((resolve, reject) => {
+        http.get(NGINX_URL, {
+            headers: {
+                'Authorization': baseAuthString
+            }
+        },(response) => {
+            const statusCode = response.statusCode;
+
+            response.on('data', (chunk) => {
+            });
+
+            response.on('end', () => {
+                if (statusCode !== 200) {
+                    reject({
+                        statusCode: statusCode,
+                    });
+                }
+                else {
+                    resolve();
+                }
+            });
+
+        }).on("error", (err) => {
+            resolve("Error authorizing");
+        });
+    })
+}
+
 // PUT /state
-app.put("/state", (req, res) => {
-    console.log(req.body)
+app.put("/state", async (req, res) => {
     const newState = req.body;
 
     if (!Object.values(State).includes(newState)) {
@@ -83,6 +122,26 @@ app.put("/state", (req, res) => {
     if (!isValidStateTransition(state, newState)) {
         res.status(400).send(`Invalid state transition from ${state} to ${newState}\n`);
         return;
+    }
+
+    if (requiresAuth(state, newState)) {
+        if (!req.headers['authorization']) {
+            res.status(401).send("Authorization required\n");
+            return;
+        }
+        else {
+            try {
+                await authorization(req.headers['authorization']);
+                console.log("AUTH OK")
+            }
+            catch (err) {
+                console.log("AUTH ERROR")
+                console.log(err)
+                res.status(err.statusCode || 500).send(`${"Invalid basic authorization header"}\n`);
+                return;
+            }
+        }
+
     }
 
     logger.log(`${state} -> ${newState}`);

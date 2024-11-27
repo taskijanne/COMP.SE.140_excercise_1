@@ -7,25 +7,48 @@
     <title>Landing Page</title>
 </head>
 <body>
-    <button id="button">REQUEST</button>
+    <button id="startButton">START</button>
+    <button id="pauseButton">PAUSE</button>
+    <button id="requestButton">REQUEST</button>
     <button id="stopButton">STOP</button>
     <pre id="message"></pre>
     <script>
+
+        function sendHTTPRequest(URL, method = "GET", body = null) {
+            return fetch(URL, {
+                method: method,
+                body: body
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.text();
+            });
+        }
+
         const messageField = document.getElementById('message');
-        document.getElementById('button').addEventListener('click', function() {
-            fetch('/api/request')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(response.statusText);
-                    }
-                        return response.text();
-                    })
+
+        document.getElementById('startButton').addEventListener('click', function() {
+            sendHTTPRequest('/api/state', 'PUT', 'RUNNING')
+            .then(data => messageField.textContent = data)
+                .catch(error => messageField.textContent = error);
+        });
+
+        document.getElementById('pauseButton').addEventListener('click', function() {
+            sendHTTPRequest('/api/state', 'PUT', 'PAUSED')
+                .then(data => messageField.textContent = data)
+                .catch(error => messageField.textContent = error);
+        });
+
+        document.getElementById('requestButton').addEventListener('click', function() {
+            sendHTTPRequest('/api/request')
                 .then(data => messageField.textContent = data)
                 .catch(error => messageField.textContent = error);
         });
         document.getElementById('stopButton').addEventListener('click', function() {
-            document.querySelector("body").innerHTML = "Server stopped";
-            fetch('/api/stop', { method: 'POST' })
+            sendHTTPRequest('/api/state', 'PUT', 'SHUTDOWN')
+                .then(document.body.innerHTML = "Shutdown initiated succesfully. Please exit the page.")
+                .catch(error => messageField.textContent = error);
         });
     </script>
 </body>

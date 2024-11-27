@@ -28,6 +28,7 @@ services:
       - NODE_ENV=production 
       - SERVICE1_URL=http://service1:8199 
       - CONTROLLER_URL=http://controller:5000
+      - NGINX_URL=http://nginx
     ports:
       - "8197:80"
     networks:
