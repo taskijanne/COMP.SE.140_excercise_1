@@ -60,5 +60,12 @@ deploy:
   script:
     - echo "Transferring docker-compose.yml to the VM"
     - scp -i ~/.ssh/key.pem docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
+    - echo "Starting deployment on the VM"
+    - ssh -i ~/.ssh/key.pem ubuntu@128.214.254.140 <<EOF
+        cd /home/ubuntu
+        docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+        docker compose pull
+        docker compose up -d
+      EOF
   only:
     - project
