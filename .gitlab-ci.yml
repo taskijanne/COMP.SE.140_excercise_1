@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - deploy
 
 variables:
   NGINX_IMAGE: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_SHORT_SHA
@@ -43,5 +44,16 @@ test:
     - docker run --rm --network host test-project
    # - docker compose exec <service-name> npm test  # Replace with your test command
     - docker compose down
+  only:
+    - project
+
+deploy:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client
+  script:
+    - echo "Transferring docker-compose.yml to the VM"
+    - scp docker-compose.yml ubuntu@$VM_ADDRESS:/home/ubuntu
   only:
     - project
