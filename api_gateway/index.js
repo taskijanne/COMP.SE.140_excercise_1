@@ -54,6 +54,33 @@ const requiresAuth = (fromState, toState) => {
     return requiresAuthTransitions.some(([from, to]) => from === fromState && to === toState);
 }
 
+async function makeGetRequest(url, headers = {}) {
+    return new Promise((resolve, reject) => {
+        http.get(url, { headers }, (response) => {
+            let data = '';
+            const statusCode = response.statusCode;
+
+            response.on('data', (chunk) => {
+                data += chunk;
+            });
+            response.on('end', () => {
+                if (statusCode !== 200) {
+                    reject({
+                        statusCode: statusCode,
+                        message: data
+                    });
+                }
+                else {
+                    resolve(data);
+                }
+            });
+
+        }).on("error", (err) => {
+            reject("Error fetching data");
+        });
+    })
+}
+
 async function getService1Data(){
     return new Promise((resolve, reject) => {
         http.get(SERVICE1_URL, (response) => {
@@ -131,7 +158,8 @@ app.put("/state", async (req, res) => {
         }
         else {
             try {
-                await authorization(req.headers['authorization']);
+                //await authorization(req.headers['authorization']);
+                await makeGetRequest(NGINX_URL, { 'Authorization': req.headers['authorization']});
                 console.log("AUTH OK")
             }
             catch (err) {
@@ -169,8 +197,9 @@ app.get("/request", async (req, res) => {
 
     // Call service 1
     try {
-        const data = await getService1Data();
-        res.status(200).send(`${JSON.stringify(data, null, 2)}\n`);
+        const data = await makeGetRequest(SERVICE1_URL);
+        const jsonData = JSON.parse(data);
+        res.status(200).send(`${JSON.stringify(jsonData, null, 2)}\n`);
     }
     catch (err) {
         res.status(err.statusCode || 500).send(`${err.message || 'Internal Server Error'}\n`);
