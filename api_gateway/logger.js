@@ -1,3 +1,5 @@
+// Simple logger class to log messages
+
 class Logger{
     constructor(){
         this.logs = [];

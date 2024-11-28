@@ -24,6 +24,7 @@ app.use((req, res, next) => {
 // In-memory state
 let state = "INIT"; // Default state
 
+// Possible states of the system
 const State = {
     INIT: "INIT",
     PAUSED: "PAUSED",
@@ -32,6 +33,7 @@ const State = {
 
 };
 
+// Valid state transitions
 const validStateTransitions = [
     [State.INIT, State.RUNNING],
     [State.RUNNING, State.PAUSED],
@@ -42,6 +44,7 @@ const validStateTransitions = [
     [State.PAUSED, State.INIT],
 ]
 
+// State transitions that require authorization
 const requiresAuthTransitions = [
     [State.INIT, State.RUNNING],
 ]
@@ -54,6 +57,7 @@ const requiresAuth = (fromState, toState) => {
     return requiresAuthTransitions.some(([from, to]) => from === fromState && to === toState);
 }
 
+// Helper function to make a GET requests by API Gateway
 async function makeGetRequest(url, headers = {}) {
     return new Promise((resolve, reject) => {
         http.get(url, { headers }, (response) => {
@@ -95,12 +99,14 @@ app.put("/state", async (req, res) => {
     }
 
     if (requiresAuth(state, newState)) {
+        // Nginx passes the basic authorization header to the API Gateway
         if (!req.headers['authorization']) {
             res.status(401).send("Authorization required\n");
             return;
         }
         else {
             try {
+                // Validate the basic authorization header by making a request to Nginx
                 await makeGetRequest(NGINX_URL, { 'Authorization': req.headers['authorization']});
             }
             catch (err) {

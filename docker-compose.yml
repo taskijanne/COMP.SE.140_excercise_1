@@ -1,8 +1,10 @@
 services:
   service1:
     build:
-      context: ./service    
-    image: ${SERVICE1_IMAGE} # The name of the image that will be created. This will be empty in local environment, to force building the container. Will be replaced by the CI/CD pipeline.
+      context: ./service 
+    # For all services, the image name is set to the environment variable. This is to allow the CI/CD pipeline to replace the image name with the correct one.
+    # In local environment, the image name will be empty, which will force the container to be built from the Dockerfile (unless the environment variable is set manually).   
+    image: ${SERVICE1_IMAGE}
     environment:
       - NODE_ENV=production 
       - SERVICE2_URL=http://service2:8299 
@@ -23,7 +25,7 @@ services:
       - service_network     
     container_name: service2
 
-  api_gateway:
+  api_gateway: # The API Gateway service which routes requests to the correct service.
     build:
       context: ./api_gateway
     image: ${API_GATEWAY_IMAGE}
