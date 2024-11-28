@@ -4,11 +4,11 @@ stages:
   - deploy
 
 variables:
-  NGINX_IMAGE: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_SHORT_SHA
-  CONTROL_SERVICE_IMAGE: $CI_REGISTRY_IMAGE/control_service:$CI_COMMIT_SHORT_SHA
-  SERVICE1_IMAGE: $CI_REGISTRY_IMAGE/service1:$CI_COMMIT_SHORT_SHA
-  SERVICE2_IMAGE: $CI_REGISTRY_IMAGE/service2:$CI_COMMIT_SHORT_SHA
-  API_GATEWAY_IMAGE: $CI_REGISTRY_IMAGE/api_gateway:$CI_COMMIT_SHORT_SHA
+  NGINX_IMAGE: $CI_REGISTRY/jannetaskinen/$CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_SHORT_SHA
+  CONTROL_SERVICE_IMAGE: $CI_REGISTRY/jannetaskinen/$CI_REGISTRY_IMAGE/control_service:$CI_COMMIT_SHORT_SHA
+  SERVICE1_IMAGE: $CI_REGISTRY/jannetaskinen/$CI_REGISTRY_IMAGE/service1:$CI_COMMIT_SHORT_SHA
+  SERVICE2_IMAGE: $CI_REGISTRY/jannetaskinen/$CI_REGISTRY_IMAGE/service2:$CI_COMMIT_SHORT_SHA
+  API_GATEWAY_IMAGE: $CI_REGISTRY/jannetaskinen/$CI_REGISTRY_IMAGE/api_gateway:$CI_COMMIT_SHORT_SHA
 
 build:
   stage: build
@@ -61,9 +61,17 @@ deploy:
     - echo "Transferring docker-compose.yml to the VM"
     - scp -i ~/.ssh/key.pem docker-compose.yml ubuntu@128.214.254.140:/home/ubuntu/
     - echo "Starting deployment on the VM"
-    - ssh -i ~/.ssh/key.pem ubuntu@128.214.254.140 docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
-    - ssh -i ~/.ssh/key.pem ubuntu@128.214.254.140 docker compose pull
-    - ssh -i ~/.ssh/key.pem ubuntu@128.214.254.140 docker compose up -d
-
+    - |
+      ssh -i ~/.ssh/key.pem ubuntu@128.214.254.140 << EOF
+      docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+      export NGINX_IMAGE=${NGINX_IMAGE}
+      export CONTROL_SERVICE_IMAGE=${CONTROL_SERVICE_IMAGE}
+      export SERVICE1_IMAGE=${SERVICE1_IMAGE}
+      export SERVICE2_IMAGE=${SERVICE2_IMAGE}
+      export API_GATEWAY_IMAGE=${API_GATEWAY_IMAGE}
+      docker compose pull
+      docker compose up -d
+      exit
+      EOF
   only:
     - project
