@@ -81,63 +81,6 @@ async function makeGetRequest(url, headers = {}) {
     })
 }
 
-async function getService1Data(){
-    return new Promise((resolve, reject) => {
-        http.get(SERVICE1_URL, (response) => {
-            let data = '';
-            const statusCode = response.statusCode;
-
-            response.on('data', (chunk) => {
-                data += chunk;
-            });
-            response.on('end', () => {
-                if (statusCode !== 200) {
-                    reject({
-                        statusCode: statusCode,
-                        message: data
-                    });
-                }
-                else {
-                    resolve(JSON.parse(data));
-                }
-            });
-
-        }).on("error", (err) => {
-            resolve("Error fetching data from service 1")
-        });
-    })
-}
-
-async function authorization(baseAuthString){
-    return new Promise((resolve, reject) => {
-        http.get(NGINX_URL, {
-            headers: {
-                'Authorization': baseAuthString
-            }
-        },(response) => {
-            const statusCode = response.statusCode;
-
-            response.on('data', (chunk) => {
-            });
-
-            response.on('end', () => {
-                if (statusCode !== 200) {
-                    reject({
-                        statusCode: statusCode,
-                    });
-                }
-                else {
-                    resolve();
-                }
-            });
-
-        }).on("error", (err) => {
-            resolve("Error authorizing");
-        });
-    })
-}
-
-// PUT /state
 app.put("/state", async (req, res) => {
     const newState = req.body;
 
@@ -158,13 +101,9 @@ app.put("/state", async (req, res) => {
         }
         else {
             try {
-                //await authorization(req.headers['authorization']);
                 await makeGetRequest(NGINX_URL, { 'Authorization': req.headers['authorization']});
-                console.log("AUTH OK")
             }
             catch (err) {
-                console.log("AUTH ERROR")
-                console.log(err)
                 res.status(err.statusCode || 500).send(`${"Invalid basic authorization header"}\n`);
                 return;
             }

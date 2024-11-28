@@ -2,7 +2,7 @@ services:
   service1:
     build:
       context: ./service    
-    image: ${SERVICE1_IMAGE:-service1:latest}
+    image: ${SERVICE1_IMAGE} # The name of the image that will be created. This will be empty in local environment, to force building the container. Will be replaced by the CI/CD pipeline.
     environment:
       - NODE_ENV=production 
       - SERVICE2_URL=http://service2:8299 
@@ -16,7 +16,7 @@ services:
   service2:
     build:
       context: ./service2   
-    image: ${SERVICE2_IMAGE:-service2:latest}
+    image: ${SERVICE2_IMAGE}
     expose:
       - "8299"              # Exposes port 8299 internally to other services in the network, but not oustide the network
     networks:
@@ -26,7 +26,7 @@ services:
   api_gateway:
     build:
       context: ./api_gateway
-    image: ${API_GATEWAY_IMAGE:-api_gateway:latest}
+    image: ${API_GATEWAY_IMAGE}
     environment:
       - NODE_ENV=production 
       - SERVICE1_URL=http://service1:8199 
@@ -40,7 +40,7 @@ services:
 
   ngingx:
     build: ./nginx
-    image: ${NGINX_IMAGE:-nginx:latest}
+    image: ${NGINX_IMAGE}
     ports:
       - "8198:80" # Maps port 8081 on the host to port 80 on the container
     networks:
@@ -53,7 +53,7 @@ services:
 
   control_service: # A control service which has a purpose of controlling the other services. In this case, killing them when user presses "STOP" button from frontend.
     build: ./control_server
-    image: ${CONTROL_SERVICE_IMAGE:-control_service:latest}
+    image: ${CONTROL_SERVICE_IMAGE}
     ports:
       - "5000"
     volumes:
