@@ -3,6 +3,7 @@ stages:
   - test
   - deploy
 
+# Tag names for the container images. Used in build stage to tag the images and in deploy stage to pull the images.
 variables:
   NGINX_IMAGE: $CI_REGISTRY_IMAGE/nginx:$CI_COMMIT_SHORT_SHA
   CONTROL_SERVICE_IMAGE: $CI_REGISTRY_IMAGE/control_service:$CI_COMMIT_SHORT_SHA
@@ -10,8 +11,7 @@ variables:
   SERVICE2_IMAGE: $CI_REGISTRY_IMAGE/service2:$CI_COMMIT_SHORT_SHA
   API_GATEWAY_IMAGE: $CI_REGISTRY_IMAGE/api_gateway:$CI_COMMIT_SHORT_SHA
 
-  REGISTRY_URL: $CI_REGISTRY/jannetaskinen/
-
+# Build stage: Builds the Docker images and pushes them to GitLab Container Registry
 build:
   stage: build
   image: docker:latest
@@ -30,7 +30,7 @@ build:
   only:
     - project
 
-# Test stage
+# Test stage: Builds the test image and runs the tests. Tests are run in a separate container which is not part of the Docker Compose network
 test:
   stage: test
   variables:
@@ -44,11 +44,16 @@ test:
     - sleep 5
     - docker build -t test-project ./tests
     - docker run --rm --network host test-project
-   # - docker compose exec <service-name> npm test  # Replace with your test command
     - docker compose down
   only:
     - project
 
+# Deploy stage:
+# 1) Transfers the docker-compose.yml file to the VM
+# 2) Logs in to the GitLab Container Registry
+# 3) Sets the environment variables for the images (the environment variables are defined also in the docker-compose.yml file)
+# 4) Pulls the images from the GitLab Container Registry
+# 5) Starts the application with docker compose
 deploy:
   stage: deploy
   image: alpine:latest
@@ -74,6 +79,6 @@ deploy:
       docker compose pull
       docker compose up -d
       exit
-      EOF
+      EOF 
   only:
     - project
